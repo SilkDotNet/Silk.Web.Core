@@ -1,0 +1,34 @@
+﻿@using Silk.Web.Core;
+@using Silk.Web.Core.Abstractions;
+@model Microsoft.AspNetCore.Mvc.ModelBinding.ModelMetadata
+@{ 
+    var checkedHtml = "";
+    if ((bool)ViewData["value"] == true)
+    {
+        checkedHtml = "checked";
+    }
+    var errors = Model.GetErrors(ViewContext.ModelState);
+    var errorClass = "";
+    if (errors.Length > 0)
+    {
+        errorClass = "has-error";
+    }
+}
+<div class="form-group @errorClass">
+    <label for="@Model.PropertyName">
+        <input id="@Model.PropertyName" name="@Model.PropertyName" type="checkbox" value="true" @checkedHtml /> @Model.GetDisplayName()
+    </label>
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <span class="help-block">@Model.Description</span>
+    }
+    @if (errors.Length > 0)
+    {
+        <span class="text-danger">
+            @foreach (var error in errors)
+            {
+                @error<br />
+            }
+        </span>
+    }
+</div>

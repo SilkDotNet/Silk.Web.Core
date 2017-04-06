@@ -1,0 +1,16 @@
+﻿@model Silk.Web.Core.Abstractions.IMenu
+
+@if (Model.MenuItems.Length > 0)
+{
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@Model.MenuTitle <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+
+        @foreach(var menuItem in Model.MenuItems)
+        {
+            <sitemenu menu="@menuItem" />
+        }
+
+        </ul>
+    </li>
+}
