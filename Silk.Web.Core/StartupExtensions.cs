@@ -76,6 +76,10 @@ namespace Silk.Web.Core
 				throw new Exception("Must add silk core web services.");
 
 			WebConfig = WebBuilder.Build(appBuilder);
+			foreach (var serviceInit in WebConfig.ServiceInitializers)
+			{
+				appBuilder.ApplicationServices.RunServiceInitializer(serviceInit);
+			}
 
 			appBuilder.UseMiddleware<WebCoreMiddleware>();
 			appBuilder.UseStaticFiles();
@@ -84,6 +88,17 @@ namespace Silk.Web.Core
 				routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
 			});
 			return appBuilder;
+		}
+
+		private static void RunServiceInitializer(this IServiceProvider serviceProvider, MethodInfo initalizerMethod)
+		{
+			var parameters = initalizerMethod.GetParameters();
+			var arguments = new object[parameters.Length];
+			for (var i = 0; i < parameters.Length; i++)
+			{
+				arguments[i] = serviceProvider.GetService(parameters[i].ParameterType);
+			}
+			initalizerMethod.Invoke(null, arguments);
 		}
 
 		private static IWebContext WebContextFactory(IServiceProvider serviceProvider)

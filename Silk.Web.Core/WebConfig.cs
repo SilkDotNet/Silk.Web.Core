@@ -10,9 +10,43 @@ namespace Silk.Web.Core
 {
 	internal class WebConfig : IWebConfig
 	{
+		public TableSchema[] DatabaseTables { get; private set; }
+		public MethodInfo[] ServiceInitializers { get; }
+
 		public WebConfig(WebBuilder webBuilder, IServiceCollection serviceCollection)
 		{
 			ScanServicesForTableSchemas(serviceCollection);
+			ServiceInitializers = ScanServicesForInitializers(serviceCollection);
+		}
+
+		private MethodInfo[] ScanServicesForInitializers(IServiceCollection serviceCollection)
+		{
+			var ret = new List<MethodInfo>();
+
+			foreach (var serviceDefinition in serviceCollection)
+			{
+				if (serviceDefinition.ImplementationType == null)
+					continue;
+
+				var serviceType = serviceDefinition.ImplementationType;
+				var serviceTypeInfo = serviceType.GetTypeInfo();
+
+				if (serviceTypeInfo.IsGenericType && serviceTypeInfo.GetGenericTypeDefinition() == typeof(OriginalService<,>))
+				{
+					serviceType = serviceTypeInfo.GetGenericArguments()[1];
+					serviceTypeInfo = serviceType.GetTypeInfo();
+				}
+
+				foreach (var method in serviceType.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+				{
+					var serviceInitAttr = method.GetCustomAttribute<ServiceInitializeAttribute>();
+					if (serviceInitAttr == null)
+						continue;
+					ret.Add(method);
+				}
+			}
+
+			return ret.ToArray();
 		}
 
 		private void ScanServicesForTableSchemas(IServiceCollection serviceCollection)
@@ -66,7 +100,5 @@ namespace Silk.Web.Core
 			}
 			DatabaseTables = dbTableList.ToArray();
 		}
-
-		public TableSchema[] DatabaseTables { get; private set; }
 	}
 }
