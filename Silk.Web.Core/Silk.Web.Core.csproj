@@ -4,7 +4,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Product>Silk .NET</Product>
     <Description />
-    <Version>0.0.0.2</Version>
+    <Version>0.0.0.3</Version>
     <Authors>John Carruthers</Authors>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
