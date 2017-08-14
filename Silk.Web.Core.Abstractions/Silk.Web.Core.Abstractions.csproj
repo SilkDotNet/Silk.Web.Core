@@ -1,21 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.0.0.3</Version>
-    <Description />
-    <Company>FragLabs</Company>
-    <Authors>John Carruthers</Authors>
-    <Product>Silk .NET</Product>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Silk.Web.Core</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputType>library</OutputType>
-  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="1.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.0" />
-    <PackageReference Include="Silk.Data" Version="0.0.0.3" />
-    <PackageReference Include="Silk.Signals" Version="0.0.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0-preview2-final" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0-preview2-final" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0-preview2-final" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Silk.DataModelling\Silk.DataModelling.csproj" />
+  </ItemGroup>
+
 </Project>
