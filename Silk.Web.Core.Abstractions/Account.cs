@@ -5,12 +5,12 @@ namespace Silk.Web.Core
 	/// <summary>
 	/// Base account type.
 	/// </summary>
-	public class Account
+	public abstract class Account : IAccountIdentifier
 	{
 		/// <summary>
 		/// Gets the account's ID.
 		/// </summary>
-		public Guid Id { get; private set; }
+		public Guid Id { get; protected set; }
 
 		/// <summary>
 		/// Gets or sets a display name for the account.

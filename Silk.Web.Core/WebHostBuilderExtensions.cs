@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Silk.Web.Core.Components;
-using System;
 
 namespace Silk.Web.Core
 {
@@ -19,17 +17,6 @@ namespace Silk.Web.Core
 			SilkStartup.AddComponent(new ComponentInformation(
 				new ReferencedComponentLoader<TComponent>()
 				));
-			return builder;
-		}
-
-		/// <summary>
-		/// Register services for dependency injection.
-		/// </summary>
-		/// <param name="builder"></param>
-		/// <param name="serviceDelegate"></param>
-		/// <returns></returns>
-		public static IWebHostBuilder WithServices(this IWebHostBuilder builder, Action<IServiceCollection> serviceDelegate)
-		{
 			return builder;
 		}
 	}

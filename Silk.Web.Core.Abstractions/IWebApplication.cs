@@ -1,4 +1,5 @@
-﻿using Silk.Web.Core.Components;
+﻿using Microsoft.Extensions.FileProviders;
+using Silk.Web.Core.Components;
 
 namespace Silk.Web.Core
 {
@@ -16,5 +17,11 @@ namespace Silk.Web.Core
 		/// Gets an ITypeLocator that can find types in the web application.
 		/// </summary>
 		ITypeLocator TypeLocator { get; }
+
+		/// <summary>
+		/// Add a view provider to the view engine.
+		/// </summary>
+		/// <param name="viewFileProvider"></param>
+		void AddViewProvider(IFileProvider viewFileProvider);
 	}
 }

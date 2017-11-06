@@ -1,9 +1,15 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Silk.Data.SQL.ORM;
+using Silk.Data.SQL.Providers;
+using Silk.Data.SQL.SQLite3;
 using Silk.Web.Core.Components;
-using Silk.Web.Core.Data;
+using Silk.Web.Core.Installation;
+using Silk.Web.Core.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +23,17 @@ namespace Silk.Web.Core
 	public class SilkStartup
 	{
 		private static readonly List<ComponentInformation> _configuredComponents = new List<ComponentInformation>();
-		private static readonly List<Action<IServiceCollection>> _serviceRegisterDelegates = new List<Action<IServiceCollection>>();
 
 		private static StartupPhase CurrentPhase { get; set; } = StartupPhase.HostBuilding;
+
+		static SilkStartup()
+		{
+			_configuredComponents.Add(
+				new ComponentInformation(
+					new ReferencedComponentLoader<InstallerComponent>()
+				)
+			);
+		}
 
 		/// <summary>
 		/// Add a component.
@@ -30,13 +44,6 @@ namespace Silk.Web.Core
 			if (CurrentPhase > StartupPhase.ComponentDiscovery)
 				throw new InvalidOperationException("Can not add a component after component discovery.");
 			_configuredComponents.Add(componentInformation);
-		}
-
-		internal static void AddServiceRegistrationDelegate(Action<IServiceCollection> @delegate)
-		{
-			if (CurrentPhase > StartupPhase.ComponentDiscovery)
-				throw new InvalidOperationException("Can not add service registration delegates after component discovery.");
-			_serviceRegisterDelegates.Add(@delegate);
 		}
 
 		private IConfiguration _configuration;
@@ -99,14 +106,9 @@ namespace Silk.Web.Core
 		/// <param name="services"></param>
 		public void ConfigureServices(IServiceCollection services)
 		{
-			foreach (var serviceRegisterDelegate in _serviceRegisterDelegates)
-			{
-				serviceRegisterDelegate(services);
-			}
-
 			var components = DiscoverComponents();
 			var loadedComponents = LoadComponents(components);
-			var webApp = new WebApplication(loadedComponents);
+			var webApp = new WebApplication(services, loadedComponents);
 
 			CurrentPhase = StartupPhase.ComponentInitalization;
 			foreach (var componentInfo in webApp.Components)
@@ -116,10 +118,17 @@ namespace Silk.Web.Core
 			foreach (var componentInfo in webApp.Components)
 				componentInfo.Component.ConfigureServices(services);
 
-			services.AddSingleton<IFlatFileModelAssembler, FlatFileModelAssembler>();
-
 			services.AddSingleton<IWebApplication>(webApp);
-			services.AddMvc();
+			services.AddMvc().ConfigureApplicationPartManager(manager =>
+				manager.ApplicationParts.Insert(0, new AssemblyPart(Assembly.GetEntryAssembly())));
+			webApp.AddEmbeddedViewProvider(typeof(WebApplication).Assembly);
+
+			services.AddSingleton<IDataProvider>(new SQLite3DataProvider("silk-db.sqlite", nonBinaryGUIDs: true));
+
+			services.AddScoped<IAccountRepository<UserAccount>, DbAccountRepository<UserAccount>>();
+			services.AddScoped<ICredentialsManager<UsernamePasswordCredentials, UserAccount>,
+				DbUserPasswordCredentialsManager<UserAccount>>();
+			services.AddScoped<IAccountRolesRepository, DbAccountRolesRepository>();
 
 			//  install Silk.Signals
 		}
@@ -133,16 +142,26 @@ namespace Silk.Web.Core
 		{
 			var webApp = app.ApplicationServices.GetRequiredService<IWebApplication>();
 
+			//  ensure DataDomain has been built, do NOT remove this even though it's not used anywhere here
+			var dataDomain = app.ApplicationServices.GetRequiredService<DataDomain>();
+
 			//  configure any middleware for components
 			CurrentPhase = StartupPhase.AddingMiddleware;
+
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.UseAuthentication();
 
 			foreach (var componentInfo in webApp.Components)
 			{
 				componentInfo.Component.AddMiddleware(app, env);
 			}
 
-			//  add MVC middleware
-			app.UseMvc();
+			app.UseStaticFiles();
+			app.UseMvcWithDefaultRoute();
 
 			CurrentPhase = StartupPhase.Startup;
 			using (var scope = app.ApplicationServices.CreateScope())
