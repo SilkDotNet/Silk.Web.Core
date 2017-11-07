@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Silk.Web.Core.Components;
 
 namespace Silk.Web.Core
@@ -23,5 +24,11 @@ namespace Silk.Web.Core
 		/// </summary>
 		/// <param name="viewFileProvider"></param>
 		void AddViewProvider(IFileProvider viewFileProvider);
+
+		/// <summary>
+		/// Creates a service scope that works with IScopedServiceProvider.
+		/// </summary>
+		/// <returns></returns>
+		IServiceScope CreateServiceScope();
 	}
 }

@@ -23,6 +23,7 @@ namespace Silk.Web.Core
 	{
 		private readonly IServiceCollection _services;
 
+		public IServiceProvider ApplicationServices { get; internal set; }
 		public LoadedComponent[] Components { get; }
 		public ITypeLocator TypeLocator { get; }
 
@@ -121,6 +122,16 @@ namespace Silk.Web.Core
 						yield return dataModelCollection;
 				}
 			}
+		}
+
+		public IServiceScope CreateServiceScope()
+		{
+			var scope = ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+				.CreateScope();
+			var scopedServiceProviderAccessor = ApplicationServices
+				.GetRequiredService<ScopedServiceProviderAccessor>();
+			scopedServiceProviderAccessor.CurrentScopedServiceProvider = scope.ServiceProvider;
+			return scope;
 		}
 	}
 }

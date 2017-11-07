@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
@@ -123,6 +124,10 @@ namespace Silk.Web.Core
 				manager.ApplicationParts.Insert(0, new AssemblyPart(Assembly.GetEntryAssembly())));
 			webApp.AddEmbeddedViewProvider(typeof(WebApplication).Assembly);
 
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<ScopedServiceProviderAccessor>();
+			services.AddSingleton<IScopedServiceProviderAccessor>(sP => sP.GetRequiredService<ScopedServiceProviderAccessor>());
+
 			services.AddSingleton<IDataProvider>(new SQLite3DataProvider("silk-db.sqlite", nonBinaryGUIDs: true));
 
 			services.AddScoped<IAccountRepository<UserAccount>, DbAccountRepository<UserAccount>>();
@@ -140,7 +145,9 @@ namespace Silk.Web.Core
 		/// <param name="env"></param>
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			var webApp = app.ApplicationServices.GetRequiredService<IWebApplication>();
+			var webApp = app.ApplicationServices.GetRequiredService<IWebApplication>()
+				as WebApplication;
+			webApp.ApplicationServices = app.ApplicationServices;
 
 			//  ensure DataDomain has been built, do NOT remove this even though it's not used anywhere here
 			var dataDomain = app.ApplicationServices.GetRequiredService<DataDomain>();
@@ -164,7 +171,7 @@ namespace Silk.Web.Core
 			app.UseMvcWithDefaultRoute();
 
 			CurrentPhase = StartupPhase.Startup;
-			using (var scope = app.ApplicationServices.CreateScope())
+			using (var scope = webApp.CreateServiceScope())
 			{
 				new StartupHelper().FindAndExecute(scope.ServiceProvider, webApp);
 			}
