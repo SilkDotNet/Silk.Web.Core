@@ -30,6 +30,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task CreateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Insert(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -47,6 +48,7 @@ namespace Silk.Web.Core.Persistence
 			where TView : new()
 		{
 			await DataModel.Insert(views)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -64,6 +66,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task UpdateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Update(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -80,6 +83,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task DeleteAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Delete(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -116,6 +120,7 @@ namespace Silk.Web.Core.Persistence
 			where TView : new()
 		{
 			return DataModel.Select<TView>(where, having, orderBy, groupBy, offset, limit)
+				.AsTransaction()
 				.ExecuteAsync(Database);
 		}
 
@@ -166,6 +171,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task CreateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Insert(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -182,6 +188,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task UpdateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Update(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
@@ -198,6 +205,7 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task DeleteAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
 			await DataModel.Delete(instances)
+				.AsTransaction()
 				.ExecuteAsync(Database)
 				.ConfigureAwait(false);
 
