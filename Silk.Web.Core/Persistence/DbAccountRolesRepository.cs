@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Silk.Data.SQL.Providers;
 using System.Linq;
+using Silk.Web.Core.Data;
 
 namespace Silk.Web.Core.Persistence
 {
@@ -10,7 +10,7 @@ namespace Silk.Web.Core.Persistence
 		DbRepositoryBase<DbAccountRolesRepository.AccountRole, DbAccountRolesRepository.AccountRole>,
 		IAccountRolesRepository
 	{
-		public DbAccountRolesRepository(IDataProvider database) : base(database)
+		public DbAccountRolesRepository(IDatabase<AccountRole> database) : base(database)
 		{
 		}
 
@@ -25,11 +25,11 @@ namespace Silk.Web.Core.Persistence
 
 		public Task SetAccountRolesAsync(IAccountIdentifier account, IEnumerable<string> roles)
 		{
-			return DataModel
+			return Database
 				.Delete(where: DataModel.Where(q => q.AccountId == account.Id))
 				.Insert(roles.Select(role => new AccountRole { AccountId = account.Id, Role = role }).ToArray())
 				.AsTransaction()
-				.ExecuteAsync(Database);
+				.ExecuteAsync();
 		}
 
 		public class AccountRole

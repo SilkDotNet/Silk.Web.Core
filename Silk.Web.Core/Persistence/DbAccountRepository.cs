@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Linq;
-using Silk.Data.SQL.Providers;
 using Silk.Signals;
 using Silk.Data.SQL.Expressions;
 using System.Collections.Generic;
+using Silk.Web.Core.Data;
 
 namespace Silk.Web.Core.Persistence
 {
@@ -16,7 +16,7 @@ namespace Silk.Web.Core.Persistence
 		public AsyncSignal<TAccount> AccountUpdated { get; } = new AsyncSignal<TAccount>();
 		public AsyncSignal<TAccount> AccountDeleted { get; } = new AsyncSignal<TAccount>();
 
-		public DbAccountRepository(IDataProvider database)
+		public DbAccountRepository(IDatabase<TAccount> database)
 			: base(database)
 		{
 		}

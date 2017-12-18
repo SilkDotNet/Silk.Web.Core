@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Routing;
 using Silk.Web.Core.Constraints;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Silk.Web.Core.Data;
-using Silk.Data.SQL.Providers;
 using Silk.Data.SQL.ORM;
 using System;
 using Silk.Web.Core.Services;
@@ -22,6 +21,7 @@ namespace Silk.Web.Core
 	public class WebApplication : IWebApplication
 	{
 		private readonly IServiceCollection _services;
+		private DataDomain _dataDomain;
 
 		public IServiceProvider ApplicationServices { get; internal set; }
 		public LoadedComponent[] Components { get; }
@@ -74,19 +74,23 @@ namespace Silk.Web.Core
 					options.LoginPath = "/signin";
 				});
 
-			_services.AddSingleton<DataDomain>(sP =>
-			{
-				var domainBuilder = new DataDomainBuilder();
-				using (var scope = sP.GetRequiredService<IServiceScopeFactory>().CreateScope())
-				{
-					BuildDataDomain(scope.ServiceProvider, domainBuilder);
-				}
-				return domainBuilder.Build();
-			});
+			_services.AddTransient<DataDomain>(sP => _dataDomain);
 			_services.AddSingleton<IFeaturesConfig, FeaturesConfigAccessor>();
-			_services.AddSingleton<IDataProvider, DefaultDatabase>();
+			_services.AddTransient<IDatabase, SilkORMDatabase>();
+			_services.AddTransient(typeof(IDatabase<>), typeof(SilkTypedORMDatabase<>));
 			_services.AddSingleton<ITokenGenerator, SecureTokenGenerator>();
 			_services.AddScoped<UserManager>();
+		}
+
+		public DataDomain BuildDataDomain()
+		{
+			var domainBuilder = new DataDomainBuilder();
+			using (var scope = CreateServiceScope())
+			{
+				BuildDataDomain(scope.ServiceProvider, domainBuilder);
+			}
+			_dataDomain = domainBuilder.Build();
+			return _dataDomain;
 		}
 
 		private void BuildDataDomain(IServiceProvider serviceProvider, DataDomainBuilder domainBuilder)

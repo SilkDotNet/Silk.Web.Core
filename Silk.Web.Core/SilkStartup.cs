@@ -150,7 +150,7 @@ namespace Silk.Web.Core
 			webApp.ApplicationServices = app.ApplicationServices;
 
 			//  ensure DataDomain has been built, do NOT remove this even though it's not used anywhere here
-			var dataDomain = app.ApplicationServices.GetRequiredService<DataDomain>();
+			var dataDomain = webApp.BuildDataDomain();
 
 			//  configure any middleware for components
 			CurrentPhase = StartupPhase.AddingMiddleware;

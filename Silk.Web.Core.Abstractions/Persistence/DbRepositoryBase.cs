@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Silk.Signals;
 using Silk.Data.SQL.ORM.Modelling;
-using Silk.Data.SQL.Providers;
 using Silk.Data.SQL.ORM;
 using Silk.Data.SQL.Expressions;
 using System.Collections.Generic;
@@ -15,9 +14,9 @@ namespace Silk.Web.Core.Persistence
 	{
 		public static EntityModel<TBusiness> DataModel { get; private set; }
 
-		protected IDataProvider Database { get; }
+		protected IDatabase<TBusiness> Database { get; }
 
-		protected DbRepositoryBase(IDataProvider database)
+		protected DbRepositoryBase(IDatabase<TBusiness> database)
 		{
 			Database = database;
 		}
@@ -29,9 +28,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task CreateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Insert(instances)
+			await Database
+				.Insert(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -47,9 +47,10 @@ namespace Silk.Web.Core.Persistence
 		protected virtual async Task CreateAsync<TView>(TView[] views, AsyncSignal<TBusiness> signal = null)
 			where TView : new()
 		{
-			await DataModel.Insert(views)
+			await Database
+				.Insert(views)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -65,9 +66,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task UpdateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Update(instances)
+			await Database
+				.Update(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -82,9 +84,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task DeleteAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Delete(instances)
+			await Database
+				.Delete(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -119,9 +122,10 @@ namespace Silk.Web.Core.Persistence
 			)
 			where TView : new()
 		{
-			return DataModel.Select<TView>(where, having, orderBy, groupBy, offset, limit)
+			return Database
+				.Select<TView>(where, having, orderBy, groupBy, offset, limit)
 				.AsTransaction()
-				.ExecuteAsync(Database);
+				.ExecuteAsync();
 		}
 
 		protected virtual async Task<long> CountAsync(
@@ -130,19 +134,20 @@ namespace Silk.Web.Core.Persistence
 			QueryExpression[] groupBy = null
 			)
 		{
-			using (var queryResult = await Database
-				.ExecuteReaderAsync(QueryExpression.Select(
-					new[] { QueryExpression.CountFunction() },
-					from: QueryExpression.Table(DataModel.Schema.EntityTable.TableName),
-					where: where,
-					having: having,
-					groupBy: groupBy
-					))
-				.ConfigureAwait(false))
-			{
-				await queryResult.ReadAsync().ConfigureAwait(false);
-				return queryResult.GetInt64(0);
-			}
+			return 0;
+			//using (var queryResult = await Database
+			//	.ExecuteReaderAsync(QueryExpression.Select(
+			//		new[] { QueryExpression.CountFunction() },
+			//		from: QueryExpression.Table(DataModel.Schema.EntityTable.TableName),
+			//		where: where,
+			//		having: having,
+			//		groupBy: groupBy
+			//		))
+			//	.ConfigureAwait(false))
+			//{
+			//	await queryResult.ReadAsync().ConfigureAwait(false);
+			//	return queryResult.GetInt64(0);
+			//}
 		}
 	}
 
@@ -156,9 +161,9 @@ namespace Silk.Web.Core.Persistence
 	{
 		public static EntityModel<TBusiness, TDomain> DataModel { get; private set; }
 
-		protected IDataProvider Database { get; }
+		protected IDatabase<TBusiness> Database { get; }
 
-		protected DbRepositoryBase(IDataProvider database)
+		protected DbRepositoryBase(IDatabase<TBusiness> database)
 		{
 			Database = database;
 		}
@@ -170,9 +175,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task CreateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Insert(instances)
+			await Database
+				.Insert(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -187,9 +193,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task UpdateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Update(instances)
+			await Database
+				.Update(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -204,9 +211,10 @@ namespace Silk.Web.Core.Persistence
 
 		protected virtual async Task DeleteAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
 		{
-			await DataModel.Delete(instances)
+			await Database
+				.Delete(instances)
 				.AsTransaction()
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false);
 
 			if (signal != null)
@@ -241,8 +249,8 @@ namespace Silk.Web.Core.Persistence
 			)
 			where TView : new()
 		{
-			return DataModel.Select<TView>(where, having, orderBy, groupBy, offset, limit)
-				.ExecuteAsync(Database);
+			return Database.Select<TView>(where, having, orderBy, groupBy, offset, limit)
+				.ExecuteAsync();
 		}
 
 		//protected virtual async Task<TBusiness> GetSingleAsync(Expression<Func<TDomain, bool>> where)

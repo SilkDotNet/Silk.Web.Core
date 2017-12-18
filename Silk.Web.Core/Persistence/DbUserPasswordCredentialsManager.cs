@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Silk.Data.SQL.Providers;
 using Silk.Data.SQL.ORM;
 using System;
 using System.Linq;
+using Silk.Web.Core.Data;
 
 namespace Silk.Web.Core.Persistence
 {
@@ -13,7 +13,8 @@ namespace Silk.Web.Core.Persistence
 	{
 		private readonly IAccountRepository<TAccount> _accounts;
 
-		public DbUserPasswordCredentialsManager(IDataProvider database, IAccountRepository<TAccount> accounts)
+		public DbUserPasswordCredentialsManager(IDatabase<LoginNamePasswordDomainModel> database,
+			IAccountRepository<TAccount> accounts)
 			: base(database)
 		{
 			_accounts = accounts;
@@ -26,12 +27,12 @@ namespace Silk.Web.Core.Persistence
 				return null;
 
 			var normalizedName = credentials.UsernameOrEmail.ToLowerInvariant();
-			var storedCredentials = (await DataModel
+			var storedCredentials = (await Database
 				.Select(
 					where: DataModel.Where(q => q.Email == normalizedName || q.Username == normalizedName),
 					limit: 1
 					)
-				.ExecuteAsync(Database)
+				.ExecuteAsync()
 				.ConfigureAwait(false))
 				.FirstOrDefault();
 			if (storedCredentials == null)
@@ -47,14 +48,14 @@ namespace Silk.Web.Core.Persistence
 		public Task SetAccountCredentialsAsync(TAccount account, UsernamePasswordCredentials credentials)
 		{
 			var password = BCrypt.Net.BCrypt.HashPassword(credentials.Password);
-			return DataModel.Insert(new LoginNamePasswordDomainModel
+			return Database.Insert(new LoginNamePasswordDomainModel
 			{
 				AccountId = account.Id,
 				Username = account.Username.ToLowerInvariant(),
 				Email = account.EmailAddress?.ToLowerInvariant(),
 				Password = password
 			})
-			.ExecuteAsync(Database);
+			.ExecuteAsync();
 		}
 
 		public class LoginNamePasswordDomainModel
