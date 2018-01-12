@@ -1,13 +1,14 @@
 ﻿using System.Threading.Tasks;
-using Silk.Data.SQL.ORM;
 using System;
 using System.Linq;
 using Silk.Web.Core.Data;
+using Silk.Data.SQL.ORM.Modelling;
+using Silk.Data.SQL;
 
 namespace Silk.Web.Core.Persistence
 {
 	public class DbUserPasswordCredentialsManager<TAccount> :
-		DbRepositoryBase<DbUserPasswordCredentialsManager<TAccount>.LoginNamePasswordDomainModel, DbUserPasswordCredentialsManager<TAccount>.LoginNamePasswordDomainModel>,
+		DbRepositoryBase<DbUserPasswordCredentialsManager<TAccount>.LoginNamePasswordDomainModel>,
 		ICredentialsManager<UsernamePasswordCredentials, TAccount>
 		where TAccount : UserAccount, new()
 	{
@@ -18,6 +19,12 @@ namespace Silk.Web.Core.Persistence
 			: base(database)
 		{
 			_accounts = accounts;
+		}
+
+		protected override void CustomizeModel(ModelCustomizer<LoginNamePasswordDomainModel> modelCustomizer)
+		{
+			modelCustomizer.For(q => q.AccountId).IsPrimaryKey();
+			modelCustomizer.For(q => q.Password).SqlType(SqlDataType.Text(128));
 		}
 
 		public async Task<TAccount> GetAccountByCredentialsAsync(UsernamePasswordCredentials credentials)
@@ -60,11 +67,9 @@ namespace Silk.Web.Core.Persistence
 
 		public class LoginNamePasswordDomainModel
 		{
-			[PrimaryKey]
 			public Guid AccountId { get; set; }
 			public string Username { get; set; }
 			public string Email { get; set; }
-			[DataLength(128)]
 			public string Password { get; set; }
 		}
 	}

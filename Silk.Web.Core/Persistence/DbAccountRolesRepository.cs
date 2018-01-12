@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Silk.Web.Core.Data;
+using Silk.Data.SQL.ORM.Modelling;
 
 namespace Silk.Web.Core.Persistence
 {
 	public class DbAccountRolesRepository :
-		DbRepositoryBase<DbAccountRolesRepository.AccountRole, DbAccountRolesRepository.AccountRole>,
+		DbRepositoryBase<DbAccountRolesRepository.AccountRole>,
 		IAccountRolesRepository
 	{
 		public DbAccountRolesRepository(IDatabase<AccountRole> database) : base(database)
 		{
+		}
+
+		protected override void CustomizeModel(ModelCustomizer<AccountRole> modelCustomizer)
+		{
+			modelCustomizer.For(q => q.AccountId).IsPrimaryKey();
 		}
 
 		public async Task<List<string>> GetAccountRolesAsync(IAccountIdentifier account)
