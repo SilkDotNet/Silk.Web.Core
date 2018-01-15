@@ -12,6 +12,7 @@ using Silk.Web.Core.Data;
 using Silk.Data.SQL.ORM;
 using System;
 using Silk.Web.Core.Services;
+using Silk.Web.Core.Notifications;
 
 namespace Silk.Web.Core
 {
@@ -80,6 +81,9 @@ namespace Silk.Web.Core
 			_services.AddTransient(typeof(IDatabase<>), typeof(SilkORMRootDatabase<>));
 			_services.AddSingleton<ITokenGenerator, SecureTokenGenerator>();
 			_services.AddScoped<UserManager>();
+
+			_services.AddTransient(typeof(INotificationSendService<>), typeof(TemplatedNotificationSendService<>));
+			_services.AddScoped<INotificationTemplateEngine, RazorNotificationTemplateEngine>();
 		}
 
 		public DataDomain BuildDataDomain()

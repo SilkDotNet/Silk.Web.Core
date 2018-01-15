@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -125,6 +126,7 @@ namespace Silk.Web.Core
 			webApp.AddEmbeddedViewProvider(typeof(WebApplication).Assembly);
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 			services.AddSingleton<ScopedServiceProviderAccessor>();
 			services.AddSingleton<IScopedServiceProviderAccessor>(sP => sP.GetRequiredService<ScopedServiceProviderAccessor>());
 
