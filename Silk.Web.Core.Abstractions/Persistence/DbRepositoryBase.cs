@@ -131,30 +131,30 @@ namespace Silk.Web.Core.Persistence
 		{
 			return Database
 				.Select<TView>(where, having, orderBy, groupBy, offset, limit)
-				.AsTransaction()
 				.ExecuteAsync();
 		}
 
-		protected virtual async Task<long> CountAsync(
+		protected virtual Task<ICollection<int>> CountAsync(
 			QueryExpression where = null,
 			QueryExpression having = null,
 			QueryExpression[] groupBy = null
 			)
 		{
-			return 0;
-			//using (var queryResult = await Database
-			//	.ExecuteReaderAsync(QueryExpression.Select(
-			//		new[] { QueryExpression.CountFunction() },
-			//		from: QueryExpression.Table(DataModel.Schema.EntityTable.TableName),
-			//		where: where,
-			//		having: having,
-			//		groupBy: groupBy
-			//		))
-			//	.ConfigureAwait(false))
-			//{
-			//	await queryResult.ReadAsync().ConfigureAwait(false);
-			//	return queryResult.GetInt64(0);
-			//}
+			return Database
+				.SelectCount(where, having, groupBy)
+				.ExecuteAsync();
+		}
+
+		protected virtual Task<ICollection<int>> CountAsync<TView>(
+			QueryExpression where = null,
+			QueryExpression having = null,
+			QueryExpression[] groupBy = null
+			)
+			where TView : new()
+		{
+			return Database
+				.SelectCount<TView>(where, having, groupBy)
+				.ExecuteAsync();
 		}
 	}
 }

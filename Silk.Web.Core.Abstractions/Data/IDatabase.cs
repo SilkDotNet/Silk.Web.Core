@@ -49,6 +49,17 @@ namespace Silk.Web.Core.Data
 			where TBusiness : new()
 			where TProjection : new();
 
+		IDatabaseQuery<int> SelectCount<TBusiness>(QueryExpression where = null,
+			QueryExpression having = null,
+			QueryExpression[] groupBy = null)
+			where TBusiness : new();
+
+		IDatabaseQuery<int> SelectCount<TBusiness, TProjection>(QueryExpression where = null,
+			QueryExpression having = null,
+			QueryExpression[] groupBy = null)
+			where TBusiness : new()
+			where TProjection : new();
+
 		void Execute();
 		Task ExecuteAsync();
 	}
@@ -82,8 +93,6 @@ namespace Silk.Web.Core.Data
 	public interface IDatabase<TBusiness> : IDatabaseBase<TBusiness, IDatabase<TBusiness>>
 		where TBusiness : new()
 	{
-		IDatabase AllDatabase { get; }
-
 		ITypedDatabaseQuery<TBusiness, TBusiness> Select(QueryExpression where = null,
 			QueryExpression having = null,
 			QueryExpression[] orderBy = null,
@@ -97,6 +106,15 @@ namespace Silk.Web.Core.Data
 			QueryExpression[] groupBy = null,
 			int? offset = null,
 			int? limit = null)
+			where TProjection : new();
+
+		ITypedDatabaseQuery<TBusiness, int> SelectCount(QueryExpression where = null,
+			QueryExpression having = null,
+			QueryExpression[] groupBy = null);
+
+		ITypedDatabaseQuery<TBusiness, int> SelectCount<TProjection>(QueryExpression where = null,
+			QueryExpression having = null,
+			QueryExpression[] groupBy = null)
 			where TProjection : new();
 
 		void Execute();

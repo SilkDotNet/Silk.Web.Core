@@ -76,8 +76,8 @@ namespace Silk.Web.Core
 
 			_services.AddTransient<DataDomain>(sP => _dataDomain);
 			_services.AddSingleton<IFeaturesConfig, FeaturesConfigAccessor>();
-			_services.AddTransient<IDatabase, SilkORMDatabase>();
-			_services.AddTransient(typeof(IDatabase<>), typeof(SilkTypedORMDatabase<>));
+			_services.AddTransient<IDatabase, SilkORMRootDatabase>();
+			_services.AddTransient(typeof(IDatabase<>), typeof(SilkORMRootDatabase<>));
 			_services.AddSingleton<ITokenGenerator, SecureTokenGenerator>();
 			_services.AddScoped<UserManager>();
 		}

@@ -8,114 +8,287 @@ using Silk.Data.SQL.Providers;
 
 namespace Silk.Web.Core.Data
 {
+	public class SilkORMRootDatabase : IDatabase
+	{
+		private readonly DataDomain _dataDomain;
+		private readonly IDataProvider _dataProvider;
+
+		public SilkORMRootDatabase(DataDomain dataDomain, IDataProvider dataProvider)
+		{
+			_dataDomain = dataDomain;
+			_dataProvider = dataProvider;
+		}
+
+		public IDatabase AsTransaction()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.AsTransaction();
+		}
+
+		public IDatabase Delete<TBusiness>(params TBusiness[] sources) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Delete<TBusiness>(sources);
+		}
+
+		public IDatabase Delete<TBusiness, TProjection>(params TProjection[] sources)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Delete<TBusiness, TProjection>(sources);
+		}
+
+		public IDatabase Delete<TBusiness>(QueryExpression where) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Delete<TBusiness>(where);
+		}
+
+		public void Execute()
+		{
+			throw new InvalidOperationException();
+		}
+
+		public Task ExecuteAsync()
+		{
+			throw new InvalidOperationException();
+		}
+
+		public IDatabase Insert<TBusiness>(params TBusiness[] sources) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Insert<TBusiness>(sources);
+		}
+
+		public IDatabase Insert<TBusiness, TProjection>(params TProjection[] sources)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Insert<TBusiness,TProjection>(sources);
+		}
+
+		public IDatabaseQuery<TBusiness> Select<TBusiness>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] orderBy = null, QueryExpression[] groupBy = null, int? offset = null, int? limit = null) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Select<TBusiness>(where, having, orderBy, groupBy, offset, limit);
+		}
+
+		public IDatabaseQuery<TProjection> Select<TBusiness, TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] orderBy = null, QueryExpression[] groupBy = null, int? offset = null, int? limit = null)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Select<TBusiness, TProjection>(where, having, orderBy, groupBy, offset, limit);
+		}
+
+		public IDatabaseQuery<int> SelectCount<TBusiness>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.SelectCount<TBusiness>(where, having, groupBy);
+		}
+
+		public IDatabaseQuery<int> SelectCount<TBusiness, TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.SelectCount<TBusiness, TProjection>(where, having, groupBy);
+		}
+
+		public IDatabase Update<TBusiness>(params TBusiness[] sources) where TBusiness : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Update<TBusiness>(sources);
+		}
+
+		public IDatabase Update<TBusiness, TProjection>(params TProjection[] sources)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase(_dataDomain, _dataProvider)
+				.Update<TBusiness,TProjection>(sources);
+		}
+	}
+
+	public class SilkORMRootDatabase<T> : IDatabase<T>
+		where T : new()
+	{
+		private readonly DataDomain _dataDomain;
+		private readonly IDataProvider _dataProvider;
+
+		public SilkORMRootDatabase(DataDomain dataDomain, IDataProvider dataProvider)
+		{
+			_dataDomain = dataDomain;
+			_dataProvider = dataProvider;
+		}
+
+		public IDatabase<T> AsTransaction()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.AsTransaction();
+		}
+
+		public IDatabase<T> Delete(params T[] sources)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Delete(sources);
+		}
+
+		public IDatabase<T> Delete<TProjection>(params TProjection[] sources) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Delete<TProjection>(sources);
+		}
+
+		public IDatabase<T> Delete(QueryExpression where)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Delete(where);
+		}
+
+		public void Execute()
+		{
+			throw new InvalidOperationException();
+		}
+
+		public Task ExecuteAsync()
+		{
+			throw new InvalidOperationException();
+		}
+
+		public IDatabase<T> Insert(params T[] sources)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Insert(sources);
+		}
+
+		public IDatabase<T> Insert<TProjection>(params TProjection[] sources) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Insert<TProjection>(sources);
+		}
+
+		public ITypedDatabaseQuery<T, T> Select(QueryExpression where = null, QueryExpression having = null, QueryExpression[] orderBy = null, QueryExpression[] groupBy = null, int? offset = null, int? limit = null)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Select(where, having, orderBy, groupBy, offset, limit);
+		}
+
+		public ITypedDatabaseQuery<T, TProjection> Select<TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] orderBy = null, QueryExpression[] groupBy = null, int? offset = null, int? limit = null) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Select<TProjection>(where, having, orderBy, groupBy, offset, limit);
+		}
+
+		public ITypedDatabaseQuery<T, int> SelectCount(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.SelectCount(where, having, groupBy);
+		}
+
+		public ITypedDatabaseQuery<T, int> SelectCount<TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.SelectCount<TProjection>(where, having, groupBy);
+		}
+
+		public IDatabase<T> Update(params T[] sources)
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Update(sources);
+		}
+
+		public IDatabase<T> Update<TProjection>(params TProjection[] sources) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<T>(_dataProvider, _dataDomain)
+				.Update<TProjection>(sources);
+		}
+	}
+
 	public abstract class SilkORMDatabaseBase<TThisInterface, TThisImpl, TQueryCollection>
 		where TThisInterface : class
 		where TThisImpl : SilkORMDatabaseBase<TThisInterface, TThisImpl, TQueryCollection>, TThisInterface
 		where TQueryCollection : QueryCollectionBase<TQueryCollection>
 	{
-		protected abstract Func<DataDomain, IDataProvider, TThisImpl> InstanceFactory { get; }
-
 		protected IDataProvider DataProvider { get; }
 		protected DataDomain DataDomain { get; }
 		protected TThisImpl Self { get; }
-		protected bool IsRoot { get; set; }
 		protected TQueryCollection Queries { get; set; }
 
 		protected SilkORMDatabaseBase(DataDomain dataDomain, IDataProvider dataProvider,
 			TQueryCollection queryCollection)
 		{
-			IsRoot = true;
 			Self = this as TThisImpl;
 			Queries = queryCollection;
 			DataDomain = dataDomain;
 			DataProvider = dataProvider;
 		}
 
-		private TThisImpl SelfOrNew()
-		{
-			if (IsRoot)
-			{
-				var ret = InstanceFactory(DataDomain, DataProvider);
-				ret.IsRoot = false;
-				return ret;
-			}
-			return Self;
-		}
-
 		public TThisInterface Insert<TBusiness>(params TBusiness[] sources)
 			where TBusiness : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Insert<TBusiness>(sources);
-			return ret;
+			Queries = Queries.Insert<TBusiness>(sources);
+			return Self;
 		}
 
 		public TThisInterface Insert<TBusiness, TEntity>(params TEntity[] sources)
 			where TBusiness : new()
 			where TEntity : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Insert<TBusiness, TEntity>(sources);
-			return ret;
+			Queries = Queries.Insert<TBusiness, TEntity>(sources);
+			return Self;
 		}
 
 		public TThisInterface Update<TBusiness>(params TBusiness[] sources)
 			where TBusiness : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Update<TBusiness>(sources);
-			return ret;
+			Queries = Queries.Update<TBusiness>(sources);
+			return Self;
 		}
 
 		public TThisInterface Update<TBusiness, TEntity>(params TEntity[] sources)
 			where TBusiness : new()
 			where TEntity : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Update<TBusiness, TEntity>(sources);
-			return ret;
+			Queries = Queries.Update<TBusiness, TEntity>(sources);
+			return Self;
 		}
 
 		public TThisInterface Delete<TBusiness>(params TBusiness[] sources)
 			where TBusiness : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Delete<TBusiness>(sources);
-			return ret;
+			Queries = Queries.Delete<TBusiness>(sources);
+			return Self;
 		}
 
 		public TThisInterface Delete<TBusiness, TEntity>(params TEntity[] sources)
 			where TBusiness : new()
 			where TEntity : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Delete<TBusiness, TEntity>(sources);
-			return ret;
+			Queries = Queries.Delete<TBusiness, TEntity>(sources);
+			return Self;
 		}
 
 		public TThisInterface Delete<TBusiness>(QueryExpression where)
 			where TBusiness : new()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.Delete<TBusiness>(where);
-			return ret;
+			Queries = Queries.Delete<TBusiness>(where);
+			return Self;
 		}
 
 		public TThisInterface AsTransaction()
 		{
-			var ret = SelfOrNew();
-			ret.Queries = ret.Queries.AsTransaction();
-			return ret;
+			Queries = Queries.AsTransaction();
+			return Self;
 		}
 	}
 
 	public class SilkORMDatabase : SilkORMDatabaseBase<IDatabase, SilkORMDatabase, QueryCollection>, IDatabase
 	{
-		protected override Func<DataDomain, IDataProvider, SilkORMDatabase> InstanceFactory =>
-			(dataDomain, dataProvider) => new SilkORMDatabase(dataDomain, dataProvider);
-
-		public SilkORMDatabase(DataDomain dataDomain, IDataProvider dataProvider, QueryCollection queries)
-			: base(dataDomain, dataProvider, new QueryCollection(dataDomain))
+		protected SilkORMDatabase(DataDomain dataDomain, IDataProvider dataProvider, QueryCollection queries)
+			: base(dataDomain, dataProvider, queries)
 		{
 		}
 
@@ -145,6 +318,18 @@ namespace Silk.Web.Core.Data
 		{
 			return new SilkORMDatabase<TProjection>(DataDomain, DataProvider, Queries.Select<TBusiness, TProjection>(where, having, orderBy, groupBy, offset, limit));
 		}
+
+		public IDatabaseQuery<int> SelectCount<TBusiness>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null) where TBusiness : new()
+		{
+			return new SilkORMDatabase<int>(DataDomain, DataProvider, Queries.SelectCount<TBusiness>(where, having, groupBy));
+		}
+
+		public IDatabaseQuery<int> SelectCount<TBusiness, TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null)
+			where TBusiness : new()
+			where TProjection : new()
+		{
+			return new SilkORMDatabase<int>(DataDomain, DataProvider, Queries.SelectCount<TBusiness, TProjection>(where, having, groupBy));
+		}
 	}
 
 	public class SilkORMDatabase<TResult> : SilkORMDatabaseBase<IDatabaseQuery<TResult>, SilkORMDatabase<TResult>, QueryCollection<TResult>>, IDatabaseQuery<TResult>
@@ -152,10 +337,7 @@ namespace Silk.Web.Core.Data
 		public SilkORMDatabase(DataDomain dataDomain, IDataProvider dataProvider, QueryCollection<TResult> queryCollection)
 			: base(dataDomain, dataProvider, queryCollection)
 		{
-			IsRoot = false;
 		}
-
-		protected override Func<DataDomain, IDataProvider, SilkORMDatabase<TResult>> InstanceFactory => throw new NotImplementedException();
 
 		public ICollection<TResult> Execute()
 		{
@@ -221,11 +403,6 @@ namespace Silk.Web.Core.Data
 	public class SilkTypedORMDatabase<TBusiness> : SilkORMDatabaseBase<TBusiness, IDatabase<TBusiness>, SilkTypedORMDatabase<TBusiness>, QueryCollection>, IDatabase<TBusiness>
 		where TBusiness : new()
 	{
-		public IDatabase AllDatabase => new SilkORMDatabase(DataDomain, DataProvider, Queries);
-
-		protected override Func<DataDomain, IDataProvider, SilkTypedORMDatabase<TBusiness>> InstanceFactory =>
-			(dataDomain, dataProvider) => new SilkTypedORMDatabase<TBusiness>(dataProvider, dataDomain);
-
 		public SilkTypedORMDatabase(IDataProvider dataProvider, DataDomain dataDomain)
 			: base(dataDomain, dataProvider, new QueryCollection(dataDomain))
 		{
@@ -252,17 +429,26 @@ namespace Silk.Web.Core.Data
 			return new SilkTypedORMDatabase<TBusiness, TProjection>(DataDomain, DataProvider,
 				Queries.Select<TBusiness, TProjection>(where, having, orderBy, groupBy, offset, limit));
 		}
+
+		public ITypedDatabaseQuery<TBusiness, int> SelectCount(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null)
+		{
+			return new SilkTypedORMDatabase<TBusiness, int>(DataDomain, DataProvider,
+				Queries.SelectCount<TBusiness>(where, having, groupBy));
+		}
+
+		public ITypedDatabaseQuery<TBusiness, int> SelectCount<TProjection>(QueryExpression where = null, QueryExpression having = null, QueryExpression[] groupBy = null) where TProjection : new()
+		{
+			return new SilkTypedORMDatabase<TBusiness, int>(DataDomain, DataProvider,
+				Queries.SelectCount<TBusiness, TProjection>(where, having, groupBy));
+		}
 	}
 
 	public class SilkTypedORMDatabase<TBusiness, TResult> : SilkORMDatabaseBase<TBusiness, ITypedDatabaseQuery<TBusiness, TResult>, SilkTypedORMDatabase<TBusiness, TResult>, QueryCollection<TResult>>, ITypedDatabaseQuery<TBusiness, TResult>
 		where TBusiness : new()
 	{
-		protected override Func<DataDomain, IDataProvider, SilkTypedORMDatabase<TBusiness, TResult>> InstanceFactory => throw new NotImplementedException();
-
 		public SilkTypedORMDatabase(DataDomain dataDomain, IDataProvider dataProvider, QueryCollection<TResult> queries)
 			: base(dataDomain, dataProvider, queries)
 		{
-			IsRoot = false;
 		}
 
 		public ICollection<TResult> Execute()
