@@ -48,8 +48,8 @@ namespace Silk.Web.Core.Persistence
 			if (!BCrypt.Net.BCrypt.Verify(credentials.Password, storedCredentials.Password))
 				return null;
 
-			return await _accounts.GetAccountByIdAsync(storedCredentials.AccountId)
-				.ConfigureAwait(false);
+			return (await _accounts.GetAccountsByIdAsync(storedCredentials.AccountId)
+				.ConfigureAwait(false)).FirstOrDefault();
 		}
 
 		public Task SetAccountCredentialsAsync(TAccount account, UsernamePasswordCredentials credentials)

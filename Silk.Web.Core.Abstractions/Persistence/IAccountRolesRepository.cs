@@ -7,5 +7,6 @@ namespace Silk.Web.Core.Persistence
 	{
 		Task<List<string>> GetAccountRolesAsync(IAccountIdentifier account);
 		Task SetAccountRolesAsync(IAccountIdentifier account, IEnumerable<string> roles);
+		Task<ICollection<IAccountIdentifier>> GetAccountsInRoleAsync(string role);
 	}
 }

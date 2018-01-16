@@ -38,10 +38,25 @@ namespace Silk.Web.Core.Persistence
 				.ExecuteAsync();
 		}
 
+		public async Task<ICollection<IAccountIdentifier>> GetAccountsInRoleAsync(string role)
+		{
+			return (await Database
+				.Select<AccountOnlyView>(where: DataModel.Where(q => q.Role == role))
+				.ExecuteAsync().ConfigureAwait(false))
+				.OfType<IAccountIdentifier>()
+				.ToArray();
+		}
+
 		public class AccountRole
 		{
 			public Guid AccountId { get; set; }
 			public string Role { get; set; }
+		}
+
+		private class AccountOnlyView : IAccountIdentifier
+		{
+			public Guid AccountId { get; set; }
+			public Guid Id => AccountId;
 		}
 
 		private class RoleOnlyView

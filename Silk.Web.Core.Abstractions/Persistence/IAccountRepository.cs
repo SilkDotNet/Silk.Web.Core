@@ -41,7 +41,7 @@ namespace Silk.Web.Core.Persistence
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		Task<TAccount> GetAccountByIdAsync(Guid id);
+		Task<ICollection<TAccount>> GetAccountsByIdAsync(params Guid[] ids);
 
 		/// <summary>
 		/// Gets a view of a single account by id from the persistent store.
@@ -49,7 +49,7 @@ namespace Silk.Web.Core.Persistence
 		/// <typeparam name="TView"></typeparam>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		Task<TView> GetAccountByIdAsync<TView>(Guid id) where TView : new();
+		Task<ICollection<TView>> GetAccountsByIdAsync<TView>(params Guid[] ids) where TView : new();
 
 		/// <summary>
 		/// Gets a collection of accounts matching a given criteria.

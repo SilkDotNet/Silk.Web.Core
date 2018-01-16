@@ -1,4 +1,6 @@
 ﻿using Silk.Web.Core.Persistence;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Silk.Web.Core.Services
@@ -32,6 +34,14 @@ namespace Silk.Web.Core.Services
 				await _credentialsManager.SetAccountCredentialsAsync(user,
 					new UsernamePasswordCredentials(null, password));
 			}
+		}
+
+		public async Task<ICollection<UserAccount>> GetUsersInRoleAsync(string role)
+		{
+			var accountIdentifiers = await _roles.GetAccountsInRoleAsync(role)
+				.ConfigureAwait(false);
+			return await _users.GetAccountsByIdAsync(accountIdentifiers.Select(q => q.Id).ToArray())
+				.ConfigureAwait(false);
 		}
 	}
 }

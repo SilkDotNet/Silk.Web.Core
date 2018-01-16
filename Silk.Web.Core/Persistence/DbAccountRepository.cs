@@ -5,7 +5,6 @@ using Silk.Signals;
 using Silk.Data.SQL.Expressions;
 using System.Collections.Generic;
 using Silk.Web.Core.Data;
-using Silk.Data.SQL.ORM.Modelling;
 
 namespace Silk.Web.Core.Persistence
 {
@@ -46,22 +45,18 @@ namespace Silk.Web.Core.Persistence
 			return base.DeleteAsync(accounts, AccountDeleted);
 		}
 
-		public async Task<TAccount> GetAccountByIdAsync(Guid id)
+		public Task<ICollection<TAccount>> GetAccountsByIdAsync(params Guid[] ids)
 		{
-			return (await SelectAsync(
-				where: QueryExpression.Compare(QueryExpression.Column(nameof(Account.Id)), ComparisonOperator.AreEqual, QueryExpression.Value(id)),
-				limit: 1)
-				.ConfigureAwait(false))
-				.FirstOrDefault();
+			return SelectAsync(
+				where: QueryExpression.Compare(QueryExpression.Column(nameof(Account.Id)), ComparisonOperator.None, QueryExpression.InFunction(ids.OfType<object>().ToArray()))
+				);
 		}
 
-		public async Task<TView> GetAccountByIdAsync<TView>(Guid id) where TView : new()
+		public Task<ICollection<TView>> GetAccountsByIdAsync<TView>(params Guid[] ids) where TView : new()
 		{
-			return (await SelectAsync<TView>(
-				where: QueryExpression.Compare(QueryExpression.Column(nameof(Account.Id)), ComparisonOperator.AreEqual, QueryExpression.Value(id)),
-				limit: 1)
-				.ConfigureAwait(false))
-				.FirstOrDefault();
+			return SelectAsync<TView>(
+				where: QueryExpression.Compare(QueryExpression.Column(nameof(Account.Id)), ComparisonOperator.None, QueryExpression.InFunction(ids.OfType<object>().ToArray()))
+				);
 		}
 
 		public Task<ICollection<TAccount>> FindAccountsAsync(AccountCriteria criteria)
