@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AngleSharp.Parser.Html;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,11 @@ namespace Silk.Web.Core.Notifications
 			_templateEngine = templateEngine;
 		}
 
-		public Task SendNotificationAsync(T notification)
+		public Task SendNotificationAsync(T notification, params UserAccount[] recipientAccounts)
 		{
 			try
 			{
-				return SendNotificationAsyncImpl(notification);
+				return SendNotificationAsyncImpl(notification, recipientAccounts);
 			}
 			catch (Exception ex)
 			{
@@ -34,7 +35,7 @@ namespace Silk.Web.Core.Notifications
 			}
 		}
 
-		public async Task SendNotificationAsyncImpl(T notification)
+		public async Task SendNotificationAsyncImpl(T notification, UserAccount[] recipientAccounts)
 		{
 			if (_notificationSenders == null || _notificationSenders.Length == 0)
 				throw new InvalidOperationException("No notification senders registered.");
@@ -44,10 +45,18 @@ namespace Silk.Web.Core.Notifications
 				var notificationText = await _templateEngine
 					.RenderAsync(notification, notificationSender.ProviderName)
 					.ConfigureAwait(false);
+				var title = ExtractTitle(notificationText);
 				await notificationSender
-					.SendAsync("", notificationText)
+					.SendAsync(title, notificationText, recipientAccounts)
 					.ConfigureAwait(false);
 			}
+		}
+
+		private string ExtractTitle(string htmlDocument)
+		{
+			var parser = new HtmlParser();
+			var document = parser.Parse(htmlDocument);
+			return document.Title;
 		}
 	}
 }
