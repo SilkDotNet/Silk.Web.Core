@@ -39,7 +39,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Silk.Data.SQL.SQLite3\Silk.Data.SQL.SQLite3\Silk.Data.SQL.SQLite3.csproj" />
-    <ProjectReference Include="..\..\Silk.Signals\Silk.Signals.ServiceMonitor\Silk.Signals.ServiceMonitor.csproj" />
     <ProjectReference Include="..\Silk.Web.Core.Abstractions\Silk.Web.Core.Abstractions.csproj" />
   </ItemGroup>
 

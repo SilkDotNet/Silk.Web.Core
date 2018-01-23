@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Linq;
-using Silk.Signals;
 using Silk.Data.SQL.Expressions;
 using System.Collections.Generic;
 using Silk.Web.Core.Data;
@@ -12,10 +11,6 @@ namespace Silk.Web.Core.Persistence
 		IAccountRepository<TAccount>
 		where TAccount : Account, new()
 	{
-		public AsyncSignal<TAccount> AccountCreated { get; } = new AsyncSignal<TAccount>();
-		public AsyncSignal<TAccount> AccountUpdated { get; } = new AsyncSignal<TAccount>();
-		public AsyncSignal<TAccount> AccountDeleted { get; } = new AsyncSignal<TAccount>();
-
 		public DbAccountRepository(IDatabase<TAccount> database)
 			: base(database)
 		{
@@ -26,7 +21,7 @@ namespace Silk.Web.Core.Persistence
 			if (accounts.Any(account => !account.Id.Equals(Guid.Empty)))
 				throw new ArgumentException("Account ids must be empty.", nameof(accounts));
 
-			return base.CreateAsync(accounts, AccountCreated);
+			return base.CreateAsync(accounts);
 		}
 
 		public Task UpdateAccountsAsync(params TAccount[] accounts)
@@ -34,7 +29,7 @@ namespace Silk.Web.Core.Persistence
 			if (accounts.Any(account => account.Id.Equals(Guid.Empty)))
 				throw new ArgumentException("Account ids must not be empty.", nameof(accounts));
 
-			return base.UpdateAsync(accounts, AccountUpdated);
+			return base.UpdateAsync(accounts);
 		}
 
 		public Task DeleteAccountsAsync(params TAccount[] accounts)
@@ -42,7 +37,7 @@ namespace Silk.Web.Core.Persistence
 			if (accounts.Any(account => account.Id.Equals(Guid.Empty)))
 				throw new ArgumentException("Account ids must not be empty.", nameof(accounts));
 
-			return base.DeleteAsync(accounts, AccountDeleted);
+			return base.DeleteAsync(accounts);
 		}
 
 		public Task<ICollection<TAccount>> GetAccountsByIdAsync(params Guid[] ids)

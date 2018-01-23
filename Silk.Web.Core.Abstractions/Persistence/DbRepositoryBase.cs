@@ -1,6 +1,5 @@
 ﻿using Silk.Web.Core.Data;
 using System.Threading.Tasks;
-using Silk.Signals;
 using Silk.Data.SQL.ORM.Modelling;
 using Silk.Data.SQL.ORM;
 using Silk.Data.SQL.Expressions;
@@ -33,25 +32,16 @@ namespace Silk.Web.Core.Persistence
 		{
 		}
 
-		protected virtual async Task CreateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
+		protected virtual async Task CreateAsync(TBusiness[] instances)
 		{
 			await Database
 				.Insert(instances)
 				.AsTransaction()
 				.ExecuteAsync()
 				.ConfigureAwait(false);
-
-			if (signal != null)
-			{
-				foreach (var instance in instances)
-				{
-					await signal.InvokeAsync(instance)
-						.ConfigureAwait(false);
-				}
-			}
 		}
 
-		protected virtual async Task CreateAsync<TView>(TView[] views, AsyncSignal<TBusiness> signal = null)
+		protected virtual async Task CreateAsync<TView>(TView[] views)
 			where TView : new()
 		{
 			await Database
@@ -59,52 +49,24 @@ namespace Silk.Web.Core.Persistence
 				.AsTransaction()
 				.ExecuteAsync()
 				.ConfigureAwait(false);
-
-			if (signal != null)
-			{
-				//  todo: load instances and call the signal for each
-				//foreach (var instance in instances)
-				//{
-				//	await signal.InvokeAsync(instance)
-				//		.ConfigureAwait(false);
-				//}
-			}
 		}
 
-		protected virtual async Task UpdateAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
+		protected virtual async Task UpdateAsync(TBusiness[] instances)
 		{
 			await Database
 				.Update(instances)
 				.AsTransaction()
 				.ExecuteAsync()
 				.ConfigureAwait(false);
-
-			if (signal != null)
-			{
-				foreach (var instance in instances)
-				{
-					await signal.InvokeAsync(instance)
-						.ConfigureAwait(false);
-				}
-			}
 		}
 
-		protected virtual async Task DeleteAsync(TBusiness[] instances, AsyncSignal<TBusiness> signal = null)
+		protected virtual async Task DeleteAsync(TBusiness[] instances)
 		{
 			await Database
 				.Delete(instances)
 				.AsTransaction()
 				.ExecuteAsync()
 				.ConfigureAwait(false);
-
-			if (signal != null)
-			{
-				foreach (var instance in instances)
-				{
-					await signal.InvokeAsync(instance)
-						.ConfigureAwait(false);
-				}
-			}
 		}
 
 		protected virtual Task<ICollection<TBusiness>> SelectAsync(

@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Silk.Data.SQL.ORM\Silk.Data.SQL.ORM\Silk.Data.SQL.ORM.csproj" />
-    <ProjectReference Include="..\..\Silk.Signals\Silk.Signals\Silk.Signals.csproj" />
   </ItemGroup>
 
 </Project>

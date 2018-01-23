@@ -1,5 +1,4 @@
-﻿using Silk.Signals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,10 +10,6 @@ namespace Silk.Web.Core.Persistence
 	/// <typeparam name="TAccount"></typeparam>
 	public interface IAccountRepository<TAccount> where TAccount : Account, new()
 	{
-		AsyncSignal<TAccount> AccountCreated { get; }
-		AsyncSignal<TAccount> AccountUpdated { get; }
-		AsyncSignal<TAccount> AccountDeleted { get; }
-
 		/// <summary>
 		/// Creates a new persistent store for an account.
 		/// </summary>
