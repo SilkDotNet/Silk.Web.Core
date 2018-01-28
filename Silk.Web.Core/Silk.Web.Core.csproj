@@ -35,10 +35,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.0.0" />
+    <PackageReference Include="Silk.Data.SQL.SQLite3" Version="0.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Silk.Data.SQL.SQLite3\Silk.Data.SQL.SQLite3\Silk.Data.SQL.SQLite3.csproj" />
     <ProjectReference Include="..\Silk.Web.Core.Abstractions\Silk.Web.Core.Abstractions.csproj" />
   </ItemGroup>
 
