@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Silk.Data.Modelling;
 using Silk.Data.SQL.ORM;
 using Silk.Data.SQL.Providers;
 using Silk.Data.SQL.SQLite3;
@@ -130,14 +131,14 @@ namespace Silk.Web.Core
 			services.AddSingleton<ScopedServiceProviderAccessor>();
 			services.AddSingleton<IScopedServiceProviderAccessor>(sP => sP.GetRequiredService<ScopedServiceProviderAccessor>());
 
+			services.AddSingleton(typeof(IMapper<>), typeof(DefaultConventionsMapper<>));
+
 			services.AddSingleton<IDataProvider>(new SQLite3DataProvider("silk-db.sqlite", nonBinaryGUIDs: true));
 
 			services.AddScoped<IAccountRepository<UserAccount>, DbAccountRepository<UserAccount>>();
 			services.AddScoped<ICredentialsManager<UsernamePasswordCredentials, UserAccount>,
 				DbUserPasswordCredentialsManager<UserAccount>>();
 			services.AddScoped<IAccountRolesRepository, DbAccountRolesRepository>();
-
-			//  install Silk.Signals
 		}
 
 		/// <summary>
